@@ -34,6 +34,8 @@ public class AuthorizerFunction implements Function<APIGatewayProxyRequestEvent,
 		}
 
 		Map<String, String> ctx = new HashMap<>();
+		ctx.put("user", "gbhosal");
+		
 		PolicyDocument policyDocument = PolicyDocument.builder()
 				.statements(statementList == null ? Collections.emptyList() : statementList).build();
 		
