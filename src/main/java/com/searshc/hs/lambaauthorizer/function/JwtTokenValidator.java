@@ -149,7 +149,7 @@ public class JwtTokenValidator {
 			}
 			
 			APIGatewayProxyRequestEvent.ProxyRequestContext proxyContext = request.getRequestContext();		
-			String arn = String.format("arn:aws:execute-api:eu-west-1:%s:%s/%s/%s%s", proxyContext.getAccountId(),
+			String arn = String.format("arn:aws:execute-api:%s:%s:%s/%s/%s%s", System.getenv("AWS_REGION"), proxyContext.getAccountId(),
 					proxyContext.getApiId(), proxyContext.getStage(), StringUtils.isBlank(method) ? proxyContext.getHttpMethod() : method, componentUri);
 			statements.add(Statement.builder().resource(arn).effect("Allow").build());
 		});

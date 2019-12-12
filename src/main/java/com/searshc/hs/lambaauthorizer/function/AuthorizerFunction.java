@@ -1,5 +1,6 @@
 package com.searshc.hs.lambaauthorizer.function;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.searshc.hs.lambaauthorizer.utils.AuthorizerUtils;
 import com.searshc.hs.lambaauthorizer.vo.AuthorizerResponse;
 import com.searshc.hs.lambaauthorizer.vo.PolicyDocument;
 import com.searshc.hs.lambaauthorizer.vo.Statement;
@@ -31,6 +33,12 @@ public class AuthorizerFunction implements Function<APIGatewayProxyRequestEvent,
 			statementList = jwtTokenValidator.buildStatement(request);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
+			statementList = new ArrayList<>();
+			APIGatewayProxyRequestEvent.ProxyRequestContext proxyContext = request.getRequestContext();
+			String arn = String.format("arn:aws:execute-api:%s:%s:%s/%s/%s%s", System.getenv("AWS_REGION"),
+					proxyContext.getAccountId(), proxyContext.getApiId(), proxyContext.getStage(),
+					proxyContext.getHttpMethod(), AuthorizerUtils.toResourceArn(proxyContext.getResourcePath()));
+			statementList.add(Statement.builder().effect("Deny").resource(arn).build());
 		}
 
 		Map<String, String> ctx = new HashMap<>();
